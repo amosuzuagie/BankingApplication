@@ -1,2 +1,9 @@
-package com.mstramohz.BankingApplication.dto;public class LoginDTO {
+package com.mstramohz.BankingApplication.dto;
+
+import lombok.Data;
+
+@Data
+public class LoginDTO {
+    private String username;
+    private String password;
 }

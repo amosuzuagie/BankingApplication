@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Entity(name = "token")
 public class Token {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(unique = true)

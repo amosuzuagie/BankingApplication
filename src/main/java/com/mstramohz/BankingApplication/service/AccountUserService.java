@@ -2,9 +2,11 @@ package com.mstramohz.BankingApplication.service;
 
 import com.mstramohz.BankingApplication.dto.UserInfo;
 import com.mstramohz.BankingApplication.entity.AccountUser;
+import com.mstramohz.BankingApplication.entity.BankAccount;
 import com.mstramohz.BankingApplication.entity.Token;
 import com.mstramohz.BankingApplication.repository.AccountUserRepository;
 import com.mstramohz.BankingApplication.enums.Role;
+import com.mstramohz.BankingApplication.repository.BankAccountRepository;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,15 +19,18 @@ import java.util.List;
 public class AccountUserService {
     private final MailService mailService;
     private final TokenService tokenService;
+    private final BankAccountService accountService;
     private final AccountUserRepository userRepository;
 
     @Autowired
     public AccountUserService (
             MailService mailService,
             TokenService tokenService,
+            BankAccountService accountService,
             AccountUserRepository userRepository
     ) {
         this.userRepository = userRepository;
+        this.accountService = accountService;
         this.tokenService = tokenService;
         this.mailService = mailService;
     }
@@ -53,10 +58,12 @@ public class AccountUserService {
         user.setRole(Role.USER);
         AccountUser savedUser = userRepository.save(user);
 
+        BankAccount account = accountService.openBankAccount(savedUser);
+
         //generate and send token via mail
         String tokenValue = tokenService.generateToken();
-        Token token = tokenService.createToken(user, tokenValue);
-        mailService.registrationNotification(savedUser.getUsername(), savedUser.getUsername(), tokenValue);
+        Token token = tokenService.saveToken(user, tokenValue);
+        mailService.registrationNotification(savedUser, tokenValue, account.getAccountNumber());
 
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }

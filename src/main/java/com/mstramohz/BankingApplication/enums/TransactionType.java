@@ -1,2 +1,6 @@
-package com.mstramohz.BankingApplication.enums;public class TransactionType {
+package com.mstramohz.BankingApplication.enums;
+
+public enum TransactionType {
+    WITHDRAWAL,
+    DEPOSIT
 }

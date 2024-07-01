@@ -16,7 +16,7 @@ public class TokenService {
     @Autowired
     private final TokenRepository repository;
 
-    protected Token createToken (AccountUser user, String value) {
+    protected Token saveToken(AccountUser user, String value) {
         Token token = new Token();
         token.setValue(value);
         token.setUser(user);
