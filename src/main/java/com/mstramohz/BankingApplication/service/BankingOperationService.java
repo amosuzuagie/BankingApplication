@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -120,6 +121,7 @@ public class BankingOperationService {
         txn.put("sender", accountFrom);
         txn.put("receiver", accountTo);
         txn.put("amount", amount);
+        txn.put("time", LocalDateTime.now());
         return txn;
     }
 
