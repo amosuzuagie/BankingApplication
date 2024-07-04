@@ -2,22 +2,24 @@ package com.mstramohz.BankingApplication.service;
 
 import com.mstramohz.BankingApplication.entity.AccountUser;
 import com.mstramohz.BankingApplication.entity.BankAccount;
+import com.mstramohz.BankingApplication.repository.AccountUserRepository;
 import com.mstramohz.BankingApplication.repository.BankAccountRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 @Service
 public class BankAccountService {
     private final BankAccountRepository accountRepository;
 
-    public BankAccountService (BankAccountRepository accountRepository) {
+    private AccountUserRepository userRepository;
+
+    @Autowired
+    public BankAccountService (BankAccountRepository accountRepository, AccountUserRepository userService) {
         this.accountRepository = accountRepository;
+        this.userRepository = userService;
     }
 
     public List<BankAccount> getAllAccount () {
@@ -26,8 +28,6 @@ public class BankAccountService {
 
     public BankAccount getAccountById (long id) {
         return accountRepository.findById(id).get();
-
-
     }
 
     public BankAccount getAccountByUser (AccountUser user) {
@@ -38,7 +38,15 @@ public class BankAccountService {
         return accountRepository.findByAccountNumber(accountNumber);
     }
 
-    public BankAccount openBankAccount ( double balance, AccountUser user) {
+    public Double getAccountBalance (String accountNumber) {
+        BankAccount account = getAccountByAccountNumber(accountNumber);
+        return account.getAccountBalance();
+    }
+
+    public BankAccount openBankAccount ( Double balance, String username) {
+        System.out.println(username);
+        AccountUser user = userRepository.findByUsername(username).get();
+        System.out.println(user);
         String accountNumber = generateAccountNumber();
         BankAccount newAccount = new BankAccount(accountNumber, balance, user);
         return accountRepository.save(newAccount);

@@ -1,13 +1,14 @@
 package com.mstramohz.BankingApplication.controller;
 
 import com.mstramohz.BankingApplication.dto.*;
-import com.mstramohz.BankingApplication.entity.AccountUser;
 import com.mstramohz.BankingApplication.service.AuthenticationService;
-import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -15,9 +16,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("auth")
+@RequestMapping("/auth")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
@@ -27,8 +29,28 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AccountUser> createUser (@RequestBody @Valid UserInfo userInfo) throws MessagingException {
-        return authenticationService.createUser(userInfo);
+    public ResponseEntity<?> createUser (@RequestBody @Valid UserInfo userInfo) throws Exception {
+        authenticationService.createUser(userInfo);
+
+        Response response = new Response(true, "Signed up. Check your mail to verify your account.", null);
+
+        Link loginLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).authenticate(null)).withRel("login");
+        Link mailVerification = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(AuthenticationController.class).AccountUserVerification(null)).withRel("verification");
+        response.add(loginLink, mailVerification);
+        return ResponseEntity.status(201).body(Optional.of(response));
+    }
+
+    @PostMapping("/register_admin_user")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> createAdminUser (@RequestBody @Valid UserInfo userInfo) throws Exception {
+        authenticationService.createAdminUser(userInfo);
+
+        Response response = new Response(true, "Signed up. Check your mail to verify your account.", null);
+
+        Link loginLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).authenticate(null)).withRel("login");
+        Link mailVerification = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(AuthenticationController.class).AccountUserVerification(null)).withRel("verification");
+        response.add(loginLink, mailVerification);
+        return ResponseEntity.status(201).body(Optional.of(response));
     }
 
     @PostMapping("/login")
@@ -50,7 +72,9 @@ public class AuthenticationController {
     }
 
     @GetMapping("/email_verification/{value}")
-    public void AccountUserVerification (@PathVariable String value) throws Exception {
+    public ResponseEntity<Response> AccountUserVerification (@PathVariable String value) throws Exception {
         authenticationService.AccountUserVerification(value);
+        Response response = new Response(true, "Verified", null);
+        return ResponseEntity.ok(response);
     }
 }

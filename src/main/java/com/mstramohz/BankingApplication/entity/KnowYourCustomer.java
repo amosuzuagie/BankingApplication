@@ -14,21 +14,27 @@ public class KnowYourCustomer {
     private Integer id;
 
     @Setter
+    @Column(nullable = false)
     private String address;
 
     @Setter
+    @Column(nullable = false)
     private String bvn;
 
     @Setter
+    @Column(nullable = false)
     private String nin;
 
     @Setter
+    @Column(nullable = false)
     private String residentLga;
 
     @Setter
+    @Column(nullable = false)
     private String residentState;
 
     @Setter
+    @Column(nullable = false)
     private String dob;
 
     @Setter

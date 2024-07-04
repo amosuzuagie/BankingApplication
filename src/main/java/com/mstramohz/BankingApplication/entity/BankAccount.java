@@ -12,6 +12,7 @@ public class BankAccount {
     private Long id;
 
     @Setter
+    @Column(nullable = false, unique = true)
     private String accountNumber;
 
     @Setter

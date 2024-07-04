@@ -1,5 +1,6 @@
 package com.mstramohz.BankingApplication.config;
 
+import com.mstramohz.BankingApplication.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,9 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/auth/email_verification/{value}").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/register_admin_user").hasAuthority(Role.ADMIN.name())
+
+                                .requestMatchers("/user/**").hasAuthority(Role.ADMIN.name())
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

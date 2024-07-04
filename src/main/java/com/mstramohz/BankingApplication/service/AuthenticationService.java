@@ -2,8 +2,6 @@ package com.mstramohz.BankingApplication.service;
 
 import com.mstramohz.BankingApplication.config.JwtService;
 import com.mstramohz.BankingApplication.dto.LoginDTO;
-import com.mstramohz.BankingApplication.dto.LoginRequest;
-import com.mstramohz.BankingApplication.dto.LoginResponse;
 import com.mstramohz.BankingApplication.dto.UserInfo;
 import com.mstramohz.BankingApplication.entity.AccountUser;
 import com.mstramohz.BankingApplication.entity.BankAccount;
@@ -15,8 +13,6 @@ import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -56,7 +52,7 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
-    public ResponseEntity<AccountUser> createUser (UserInfo userInfo) throws MessagingException {
+    public void createUser (UserInfo userInfo) throws MessagingException {
         AccountUser user = new AccountUser();
 
         user.setFirstname(userInfo.getFirstname());
@@ -73,8 +69,25 @@ public class AuthenticationService {
         String tokenValue = tokenService.generateToken();
         tokenService.saveToken(savedUser, tokenValue);
         mailService.registrationNotification(savedUser, tokenValue, account.getAccountNumber());
+    }
 
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+    public void createAdminUser (UserInfo userInfo) throws MessagingException {
+        AccountUser user = new AccountUser();
+
+        user.setFirstname(userInfo.getFirstname());
+        user.setLastname(userInfo.getLastname());
+        user.setUsername(userInfo.getUsername());
+        user.setPassword(userInfo.getPassword());
+        user.setPhoneNumber(userInfo.getPhoneNumber());
+        user.setRole(Role.ADMIN);
+        AccountUser savedUser = userRepository.save(user);
+
+//        BankAccount account = accountService.openBankAccount(savedUser);
+
+        //generate and send token via mail
+        String tokenValue = tokenService.generateToken();
+        tokenService.saveToken(savedUser, tokenValue);
+        mailService.registrationNotification(savedUser, tokenValue, null);
     }
 
     public String login (LoginDTO dto) {
@@ -88,10 +101,6 @@ public class AuthenticationService {
             throw new ArithmeticException("Authentication denied.");
         }
     }
-
-    /*public void logout (String authToken) {
-        jwtService.invalidateToken(authToken);
-    }*/
 
     public void AccountUserVerification (String value) throws Exception {
         if (!value.isEmpty()) {
@@ -108,6 +117,7 @@ public class AuthenticationService {
             }
             user.setEnabled(true);
             userRepository.save(user);
+            tokenRepository.delete(dbToken);
         } else {
             throw new Exception("Token is required.");
         }

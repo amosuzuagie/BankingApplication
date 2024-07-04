@@ -6,7 +6,6 @@ import com.mstramohz.BankingApplication.entity.BankAccount;
 import com.mstramohz.BankingApplication.entity.Token;
 import com.mstramohz.BankingApplication.repository.AccountUserRepository;
 import com.mstramohz.BankingApplication.enums.Role;
-import com.mstramohz.BankingApplication.repository.BankAccountRepository;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,7 +46,7 @@ public class AccountUserService {
         return new ResponseEntity<>(userRepository.findByUsername(username).get(), HttpStatus.OK);
     }
 
-    public ResponseEntity<AccountUser> createUser (UserInfo userInfo) throws MessagingException {
+    public void createUser (UserInfo userInfo) throws MessagingException {
         AccountUser user = new AccountUser();
 
         user.setFirstname(userInfo.getFirstname());
@@ -64,8 +63,6 @@ public class AccountUserService {
         String tokenValue = tokenService.generateToken();
         Token token = tokenService.saveToken(user, tokenValue);
         mailService.registrationNotification(savedUser, tokenValue, account.getAccountNumber());
-
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
     public ResponseEntity<AccountUser> updateUser (long id, AccountUser update) {

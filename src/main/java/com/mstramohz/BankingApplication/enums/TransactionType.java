@@ -1,6 +1,7 @@
 package com.mstramohz.BankingApplication.enums;
 
 public enum TransactionType {
-    WITHDRAWAL,
-    DEPOSIT
+    WITHDRAWAL("withdrawal"),
+    DEPOSIT("deposit");
+    TransactionType (String value) {}
 }

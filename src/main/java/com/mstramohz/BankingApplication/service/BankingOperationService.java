@@ -11,6 +11,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -47,7 +49,7 @@ public class BankingOperationService {
         transactionsRepository.save(txn);
     }
 
-    public BankAccount depositFund (String accountNumber, double amount) throws MessagingException {
+    public Transactions depositFund (String accountNumber, double amount) throws MessagingException {
         if (amount < 0) throw new TransactionException("Invalid amount.");
 
         BankAccount dbAccount = bankAccountService.getAccountByAccountNumber(accountNumber);
@@ -64,7 +66,7 @@ public class BankingOperationService {
         txn.setTransactionId(generateTnxId());
         transactionsRepository.save(txn);
 
-        return dbAccount;
+        return txn;
     }
 
     public void withdrawFund (String accountNumber, double amount, String transactionId) throws MessagingException {
@@ -85,7 +87,7 @@ public class BankingOperationService {
         transactionsRepository.save(txn);
     }
 
-    public BankAccount withdrawFund (String accountNumber, double amount) throws MessagingException {
+    public Transactions withdrawFund (String accountNumber, double amount) throws MessagingException {
         BankAccount dbAccount = bankAccountService.getAccountByAccountNumber(accountNumber);
         assert dbAccount != null;
 
@@ -102,17 +104,23 @@ public class BankingOperationService {
         txn.setType(TransactionType.WITHDRAWAL);
         transactionsRepository.save(txn);
 
-        return dbAccount;
+        return txn;
     }
 
     @Transactional
-    public void transferFund (String accountFrom, String accountTo, double amount) throws MessagingException {
+    public Map<String, Object> transferFund (String accountFrom, String accountTo, double amount) throws MessagingException {
         BankAccount dbAccountFrom = bankAccountService.getAccountByAccountNumber(accountFrom);
         BankAccount dbAccountTo = bankAccountService.getAccountByAccountNumber(accountTo);
         assert dbAccountFrom != null && dbAccountTo != null;
         String txnId = generateTnxId();
         withdrawFund(accountFrom, amount,txnId);
         depositFund(accountTo, amount, txnId);
+
+        Map<String, Object> txn = new HashMap<>();
+        txn.put("sender", accountFrom);
+        txn.put("receiver", accountTo);
+        txn.put("amount", amount);
+        return txn;
     }
 
     private String generateTnxId () {

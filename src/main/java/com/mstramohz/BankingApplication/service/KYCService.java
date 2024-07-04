@@ -5,7 +5,6 @@ import com.mstramohz.BankingApplication.dto.Response;
 import com.mstramohz.BankingApplication.entity.KnowYourCustomer;
 import com.mstramohz.BankingApplication.repository.KYCRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 

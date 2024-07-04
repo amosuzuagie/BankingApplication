@@ -32,7 +32,6 @@ public class AccountUser implements UserDetails {
     @Column(nullable = false, unique = true, length = 100)
     private String username;
 
-    @Setter
     @Column(nullable = false)
     private String password;
 

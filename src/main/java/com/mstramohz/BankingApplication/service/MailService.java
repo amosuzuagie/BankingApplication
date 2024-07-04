@@ -19,8 +19,7 @@ public class MailService {
     @Async
     public void registrationNotification (AccountUser user, String token, String accountNumber) throws MessagingException {
         String subject = "Registration Notification";
-        String message = "Dear " + user.getFirstname() + "," + "\nCongratulations! Your account is successfully create and your account number is: " + accountNumber +
-                "/nKindly click on: " + "http://localhost:8080/api/v1/auth/email_verification/" + token + " to verify your email.";
+        String message = STR."Dear \{user.getFirstname()},\nCongratulations! Your account is successfully create and your account number is: \{accountNumber}/nKindly click on: http://localhost:8080/api/v1/auth/email_verification/\{token} to verify your email.";
         MimeMessageHelper messageHelper = mimeMessageHelper(user.getUsername(), subject, message);
         javaMailSender.send(messageHelper.getMimeMessage());
     }
@@ -28,7 +27,7 @@ public class MailService {
     @Async
     public void loginNotification (String receiver, String firstname) throws MessagingException {
         String subject = "Login Notification";
-        String message = String.format("Dear %s, \nThere has been a successful login into your Bank Account. If you did not login call 077-242810 for prompt action. \nThank you for banking with us.", firstname);
+        String message = STR."Dear \{firstname}, \nThere was a successful login to your account. if this wasn't you, please call 077-246810 for prompt action. \n Thank you for banking with us.";
         MimeMessageHelper messageHelper = mimeMessageHelper(receiver, subject, message);
         javaMailSender.send(messageHelper.getMimeMessage());
     }
@@ -36,7 +35,7 @@ public class MailService {
     @Async
     public void withdrawalNotification (String receiver, String firstname, double amount) throws MessagingException {
         String subject = "Debit Alert";
-        String message = String.format("Dear %s, a debit of %s was debited from your account.", firstname, amount);
+        String message = STR."Dear \{firstname}, a debit of \{amount} wad diducted from your account.";
         MimeMessageHelper messageHelper = mimeMessageHelper(receiver, subject, message);
         javaMailSender.send(messageHelper.getMimeMessage());
     }
@@ -44,7 +43,7 @@ public class MailService {
     @Async
     public void depositNotification (String receiver, String firstname, double amount) throws MessagingException {
         String subject = "Debit Alert";
-        String message = String.format("Dear %s, a credit of %s was deposited into your account.", firstname, amount);
+        String message = STR."Dear \{firstname}, a credit of \{amount} was deposited into ypur account.";
         MimeMessageHelper messageHelper = mimeMessageHelper(receiver, subject, message);
         javaMailSender.send(messageHelper.getMimeMessage());
     }

@@ -18,14 +18,15 @@ public class UserInfo {
     @Length(min = 3, message = "Last name can not be less than 3 letters.")
     private String lastname;
 
-    @Email(message = "Please put a valid email.")
+    @Email(message = "Invalid email format.")
     @NotEmpty(message = "Username is required.")
     private String username;
 
     @NotEmpty(message = "Password is required.")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*\\W).{8,}$")
     private String password;
 
     @NotEmpty(message = "Phone number is required.")
-    @Pattern(regexp = "[0-9]{11}")
+    @Pattern(regexp = "[0-9]{11,15}")
     private String phoneNumber;
 }
